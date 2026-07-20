@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Attendance - Student Management</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">SMS</div>
+      <nav>
+        <a href="/">Dashboard</a>
+        <a href="/students">Students</a>
+        <a href="/attendance" class="active">Attendance</a>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h1>Attendance</h1>
+          <span class="section-tag">Track class presence</span>
+          <p class="subtitle">Record daily attendance and review student attendance history.</p>
+        </div>
+        <div class="topbar-right">
+          <span class="welcome-text">Hello, {{ session.get('user_name', 'User') }}</span>
+          <a href="/logout" class="btn secondary">Logout</a>
+        </div>
+      </header>
+
+      <section class="toolbar">
+        <div class="toolbar-left">
+          <input type="date" id="attendance-date-filter" />
+          <button id="btn-filter-attendance" class="btn secondary">Filter</button>
+          <button id="btn-refresh-attendance" class="btn secondary">Refresh</button>
+          <button id="btn-export-attendance" class="btn accent">Export to Google Sheets</button>
+        </div>
+        <div>
+          <button id="btn-open-attendance-form" class="btn accent">Add Attendance</button>
+        </div>
+      </section>
+      <div class="toolbar-message" id="attendance-export-status"></div>
+
+      <section class="content">
+        <table class="table" id="attendance-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Student</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Remarks</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="attendance-body">
+            <tr><td colspan="6">Loading...</td></tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal" id="attendance-modal" aria-hidden="true">
+    <div class="modal-content">
+      <h3 id="attendance-modal-title">Add Attendance</h3>
+      <form id="attendance-form">
+        <input type="hidden" id="attendance-record-id" />
+        <div class="form-row">
+          <label>Student</label>
+          <select id="attendance_student_id" required></select>
+        </div>
+        <div class="form-row">
+          <label>Date</label>
+          <input type="date" id="attendance_date" required />
+        </div>
+        <div class="form-row">
+          <label>Status</label>
+          <select id="attendance_status" required>
+            <option value="Present">Present</option>
+            <option value="Absent">Absent</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>Remarks</label>
+          <textarea id="attendance_remarks" placeholder="Optional notes"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="submit" id="attendance-save" class="btn">Save</button>
+          <button type="button" id="attendance-cancel" class="btn secondary">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/static/js/script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      attachAttendancePageHandlers();
+      loadAttendanceStudents();
+      loadAttendance();
+    });
+  </script>
+</body>
+</html>

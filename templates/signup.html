@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sign Up - Student Management</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1>Create Account</h1>
+        <p>Register and start managing your student records.</p>
+      </div>
+      <form id="signup-form">
+        <div class="form-row">
+          <label>Full Name</label>
+          <input type="text" id="signup-name" required />
+        </div>
+        <div class="form-row">
+          <label>Email</label>
+          <input type="email" id="signup-email" required />
+        </div>
+        <div class="form-row">
+          <label>Password</label>
+          <input type="password" id="signup-password" required />
+        </div>
+        <div class="form-row">
+          <label>Confirm Password</label>
+          <input type="password" id="signup-confirm" required />
+        </div>
+        <button type="submit" class="btn auth-btn">Sign Up</button>
+      </form>
+      <div class="auth-footer">
+        <span>Already have an account?</span>
+        <a href="/login">Login here</a>
+      </div>
+    </div>
+  </div>
+  <script>
+    // When using the static dev server (live-server) the backend runs on Flask (port 5000).
+    // Expose a global `window.API_BASE` so scripts and other pages can reuse the same base URL.
+    window.API_BASE = window.API_BASE || ((window.location.port === '5500') ? 'http://127.0.0.1:5000' : window.location.origin);
+    const API_BASE = window.API_BASE;
+
+    document.getElementById('signup-form').addEventListener('submit', async function(e){
+      e.preventDefault();
+      const full_name = document.getElementById('signup-name').value.trim();
+      const email = document.getElementById('signup-email').value.trim();
+      const password = document.getElementById('signup-password').value;
+      const confirm_password = document.getElementById('signup-confirm').value;
+
+      const url = API_BASE + '/api/signup';
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({full_name, email, password, confirm_password})
+        });
+
+        // Safely parse JSON only when present
+        let data = null;
+        const contentType = res.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          // response body may still be empty on errors; guard against that
+          try {
+            data = await res.json();
+          } catch (parseErr) {
+            data = null;
+          }
+        }
+
+        if (!res.ok) {
+          const message = data && (data.error || data.errors) ? (data.error || JSON.stringify(data.errors)) : ('Signup failed (status ' + res.status + ')');
+          alert(message);
+          return;
+        }
+
+        window.location.href = '/';
+      } catch (err) {
+        console.error('Network or server error during signup:', err);
+        alert('Unable to contact the backend. Is the server running?');
+      }
+    });
+  </script>
+</body>
+</html>

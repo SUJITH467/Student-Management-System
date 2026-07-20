@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Student Management System</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <style>
+    .page { display: none; }
+    .page.active { display: block; }
+    .auth-page.active { display: flex; }
+  </style>
+</head>
+<body>
+  <!-- LOGIN PAGE -->
+  <div class="page auth-page" id="login-page">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1>Welcome Back</h1>
+        <p>Sign in to manage your college student records.</p>
+      </div>
+      <form id="login-form">
+        <div class="form-row">
+          <label>Email</label>
+          <input type="email" id="login-email" required />
+        </div>
+        <div class="form-row">
+          <label>Password</label>
+          <input type="password" id="login-password" required />
+        </div>
+        <button type="submit" class="btn auth-btn">Login</button>
+      </form>
+      <div class="auth-footer">
+        <span>New here?</span>
+        <a href="javascript:showPage('signup-page')">Create an account</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIGNUP PAGE -->
+  <div class="page auth-page" id="signup-page">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1>Create Account</h1>
+        <p>Register and start managing your student records.</p>
+      </div>
+      <form id="signup-form">
+        <div class="form-row">
+          <label>Full Name</label>
+          <input type="text" id="signup-name" required />
+        </div>
+        <div class="form-row">
+          <label>Email</label>
+          <input type="email" id="signup-email" required />
+        </div>
+        <div class="form-row">
+          <label>Password</label>
+          <input type="password" id="signup-password" required />
+        </div>
+        <div class="form-row">
+          <label>Confirm Password</label>
+          <input type="password" id="signup-confirm" required />
+        </div>
+        <button type="submit" class="btn auth-btn">Sign Up</button>
+      </form>
+      <div class="auth-footer">
+        <span>Already have an account?</span>
+        <a href="javascript:showPage('login-page')">Login here</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD PAGE -->
+  <div class="page" id="dashboard-page">
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand">SMS</div>
+        <nav>
+          <a href="javascript:showPage('dashboard-page')" class="active">Dashboard</a>
+          <a href="javascript:showPage('students-page')">Students</a>
+          <a href="javascript:showPage('attendance-page')">Attendance</a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <h1>Dashboard</h1>
+            <span class="section-tag">Academic Summary</span>
+            <p class="subtitle">Track students, courses, and departments with a clean, modern overview.</p>
+          </div>
+          <div class="topbar-right">
+            <span class="welcome-text">Hello, {{ session.get('user_name', 'Manager') }}</span>
+            <a href="/logout" class="btn secondary">Logout</a>
+          </div>
+        </header>
+
+        <section class="info-strip">
+          <div>Last updated just now</div>
+          <div class="badge">Realtime metrics enabled</div>
+        </section>
+
+        <section class="cards" id="cards">
+          <div class="card">
+            <h3>Total Students</h3>
+            <div class="card-value" id="total-students">0</div>
+          </div>
+          <div class="card">
+            <h3>Total Courses</h3>
+            <div class="card-value" id="total-courses">0</div>
+          </div>
+          <div class="card">
+            <h3>Total Departments</h3>
+            <div class="card-value" id="total-departments">0</div>
+          </div>
+        </section>
+
+        <section class="content">
+          <h2>Overview</h2>
+          <p>Welcome to the Student Management System dashboard. Use the sidebar to manage students.</p>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- STUDENTS PAGE -->
+  <div class="page" id="students-page">
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand">SMS</div>
+        <nav>
+          <a href="javascript:showPage('dashboard-page')">Dashboard</a>
+          <a href="javascript:showPage('students-page')" class="active">Students</a>
+          <a href="javascript:showPage('attendance-page')">Attendance</a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <h1>Students</h1>
+            <span class="section-tag">Manage student records</span>
+            <p class="subtitle">Manage student profiles, search records, and update details in one place.</p>
+          </div>
+          <div class="topbar-right">
+            <span class="welcome-text">Hello, {{ session.get('user_name', 'User') }}</span>
+            <a href="/logout" class="btn secondary">Logout</a>
+          </div>
+        </header>
+
+        <section class="toolbar">
+          <div class="toolbar-left">
+            <input type="text" id="search" placeholder="Search by name, id, email..." />
+            <button id="btn-search" class="btn secondary">Search</button>
+            <button id="btn-refresh" class="btn secondary">Refresh</button>
+          </div>
+          <div>
+            <button id="btn-open-form" class="btn accent">Add Student</button>
+          </div>
+        </section>
+
+        <section class="content">
+          <table class="table" id="students-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Student ID</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Department</th>
+                <th>Year</th>
+                <th>Type</th>
+                <th>DOB</th>
+                <th>Address</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="students-body">
+              <tr><td colspan="11">Loading...</td></tr>
+            </tbody>
+          </table>
+        </section>
+      </main>
+    </div>
+
+    <!-- Student Modal / Form -->
+    <div class="modal" id="student-modal" aria-hidden="true">
+      <div class="modal-content">
+        <h3 id="modal-title">Add Student</h3>
+        <form id="student-form">
+          <input type="hidden" id="student-db-id" />
+          <div class="form-row">
+            <label>Student ID</label>
+            <input type="text" id="student_id" required />
+          </div>
+          <div class="form-row">
+            <label>Full Name</label>
+            <input type="text" id="full_name" required />
+          </div>
+          <div class="form-row">
+            <label>Email</label>
+            <input type="email" id="email" required />
+          </div>
+          <div class="form-row">
+            <label>Phone</label>
+            <input type="text" id="phone" />
+          </div>
+          <div class="form-row">
+            <label>Department</label>
+            <select id="department_id" required></select>
+          </div>
+          <div class="form-row">
+            <label>Year</label>
+            <input type="number" id="year" min="1" max="10" required />
+          </div>
+          <div class="form-row">
+            <label>Date of Birth</label>
+            <input type="date" id="dob" />
+          </div>
+          <div class="form-row">
+            <label>Address</label>
+            <textarea id="address" placeholder="Street address"></textarea>
+          </div>
+          <div class="form-row">
+            <label>Type</label>
+            <select id="type" required>
+              <option value="">Select Type</option>
+              <option value="Regular">Regular</option>
+              <option value="Part-time">Part-time</option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button type="submit" id="save-student" class="btn">Save</button>
+            <button type="button" id="close-form" class="btn secondary">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ATTENDANCE PAGE -->
+  <div class="page" id="attendance-page">
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand">SMS</div>
+        <nav>
+          <a href="javascript:showPage('dashboard-page')">Dashboard</a>
+          <a href="javascript:showPage('students-page')">Students</a>
+          <a href="javascript:showPage('attendance-page')" class="active">Attendance</a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <h1>Attendance</h1>
+            <span class="section-tag">Track class presence</span>
+            <p class="subtitle">Record daily attendance and review student attendance history.</p>
+          </div>
+          <div class="topbar-right">
+            <span class="welcome-text">Hello, {{ session.get('user_name', 'User') }}</span>
+            <a href="/logout" class="btn secondary">Logout</a>
+          </div>
+        </header>
+
+        <section class="toolbar">
+          <div class="toolbar-left">
+            <input type="date" id="attendance-date-filter" />
+            <button id="btn-filter-attendance" class="btn secondary">Filter</button>
+            <button id="btn-refresh-attendance" class="btn secondary">Refresh</button>
+            <button id="btn-export-attendance" class="btn accent">Export to Google Sheets</button>
+          </div>
+          <div>
+            <button id="btn-open-attendance-form" class="btn accent">Add Attendance</button>
+          </div>
+        </section>
+        <div class="toolbar-message" id="attendance-export-status"></div>
+
+        <section class="content">
+          <table class="table" id="attendance-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Student</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Remarks</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="attendance-body">
+              <tr><td colspan="6">Loading...</td></tr>
+            </tbody>
+          </table>
+        </section>
+      </main>
+    </div>
+
+    <!-- Attendance Modal -->
+    <div class="modal" id="attendance-modal" aria-hidden="true">
+      <div class="modal-content">
+        <h3 id="attendance-modal-title">Add Attendance</h3>
+        <form id="attendance-form">
+          <input type="hidden" id="attendance-record-id" />
+          <div class="form-row">
+            <label>Student</label>
+            <select id="attendance_student_id" required></select>
+          </div>
+          <div class="form-row">
+            <label>Date</label>
+            <input type="date" id="attendance_date" required />
+          </div>
+          <div class="form-row">
+            <label>Status</label>
+            <select id="attendance_status" required>
+              <option value="Present">Present</option>
+              <option value="Absent">Absent</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Remarks</label>
+            <textarea id="attendance_remarks" placeholder="Optional notes"></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="submit" id="attendance-save" class="btn">Save</button>
+            <button type="button" id="attendance-cancel" class="btn secondary">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/script.js"></script>
+  <script>
+    // Page Navigation
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+      const page = document.getElementById(pageId);
+      if (page) {
+        page.classList.add('active');
+        // Update active nav items
+        document.querySelectorAll('nav a').forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector(`nav a[href="javascript:showPage('${pageId}')"]`);
+        if (activeLink) activeLink.classList.add('active');
+      }
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      // When developing with live-server the frontend is served on :5500
+      // while Flask runs on :5000. Expose a global `window.API_BASE` so
+      // other scripts can detect the API host. In production this will
+      // default to same-origin.
+      window.API_BASE = window.API_BASE || ((window.location.port === '5500') ? 'http://127.0.0.1:5000' : window.location.origin);
+      const API_BASE = window.API_BASE;
+
+      const userLoggedIn = localStorage.getItem('user_logged_in');
+      if (userLoggedIn) {
+        showPage('dashboard-page');
+        loadDashboard();
+      } else {
+        showPage('login-page');
+      }
+
+      // Login form handler
+      const loginForm = document.getElementById('login-form');
+      if (loginForm) {
+        loginForm.addEventListener('submit', async function(e){
+          e.preventDefault();
+          const email = document.getElementById('login-email').value.trim();
+          const password = document.getElementById('login-password').value;
+          const url = API_BASE + '/api/login';
+          try {
+            const res = await fetch(url, {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({email, password})
+            });
+
+            let data = null;
+            const contentType = res.headers.get('content-type') || '';
+            if (contentType.includes('application/json')) {
+              try { data = await res.json(); } catch (err) { data = null; }
+            }
+
+            if (!res.ok) {
+              alert((data && (data.error || data.errors)) ? (data.error || JSON.stringify(data.errors)) : ('Login failed (status ' + res.status + ')'));
+              return;
+            }
+
+            localStorage.setItem('user_logged_in', 'true');
+            showPage('dashboard-page');
+            loadDashboard();
+          } catch (err) {
+            console.error('Login request failed:', err);
+            alert('Unable to contact backend. Is the Flask server running on port 5000?');
+          }
+        });
+      }
+
+      // Signup form handler
+      const signupForm = document.getElementById('signup-form');
+      if (signupForm) {
+        signupForm.addEventListener('submit', async function(e){
+          e.preventDefault();
+          const full_name = document.getElementById('signup-name').value.trim();
+          const email = document.getElementById('signup-email').value.trim();
+          const password = document.getElementById('signup-password').value;
+          const confirm_password = document.getElementById('signup-confirm').value;
+          const url = API_BASE + '/api/signup';
+          try {
+            const res = await fetch(url, {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({full_name, email, password, confirm_password})
+            });
+
+            let data = null;
+            const contentType = res.headers.get('content-type') || '';
+            if (contentType.includes('application/json')) {
+              try { data = await res.json(); } catch (err) { data = null; }
+            }
+
+            if (!res.ok) {
+              alert((data && (data.error || data.errors)) ? (data.error || JSON.stringify(data.errors)) : ('Signup failed (status ' + res.status + ')'));
+              return;
+            }
+
+            localStorage.setItem('user_logged_in', 'true');
+            showPage('dashboard-page');
+            loadDashboard();
+          } catch (err) {
+            console.error('Signup request failed:', err);
+            alert('Unable to contact backend. Is the Flask server running on port 5000?');
+          }
+        });
+      }
+    });
+
+    // Logout handler - update logout links to work with new system
+    document.addEventListener('click', function(e) {
+      if (e.target.getAttribute('href') === '/logout') {
+        e.preventDefault();
+        localStorage.removeItem('user_logged_in');
+        const logoutUrl = (typeof API_BASE !== 'undefined' ? API_BASE : '') + '/logout';
+        fetch(logoutUrl, {method: 'POST'}).then(() => {
+          showPage('login-page');
+          document.getElementById('login-email').value = '';
+          document.getElementById('login-password').value = '';
+        }).catch(err => {
+          console.error('Logout request failed:', err);
+          showPage('login-page');
+        });
+      }
+    });
+  </script>
+</body>
+</html>
